@@ -46,6 +46,64 @@ mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build .
 ```
 
+### Build for iOS (unofficial)
+This is a way what I found. It is unofficial way to build the static libraries for iOS:
+
+add the following line to the leveldb/CMakeLists.txt
+
+```
+set(CMAKE_OSX_ARCHITECTURES "armv7;arm64")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "")
+set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk")
+```
+after 
+
+```
+if (WIN32)
+  set(LEVELDB_PLATFORM_NAME LEVELDB_PLATFORM_WINDOWS)
+  # TODO(cmumford): Make UNICODE configurable for Windows.
+  add_definitions(-D_UNICODE -DUNICODE)
+else (WIN32)
+  set(LEVELDB_PLATFORM_NAME LEVELDB_PLATFORM_POSIX)
+endif (WIN32)
+```
+
+before
+
+```
+option(LEVELDB_BUILD_TESTS "Build LevelDB's unit tests" ON)
+```
+
+
+and
+
+
+comment the three lines in third_party/benchmark/CMakeLists.txt
+
+```
+if(NOT HAVE_STD_REGEX AND NOT HAVE_GNU_POSIX_REGEX AND NOT HAVE_POSIX_REGEX)
+  message(FATAL_ERROR "Failed to determine the source files for the regular expression backend")
+endif()
+```
+
+(I don't know why after I set the parameter like CMAKE_OSX_ARCHITECTURES, the benchmark can't pass. So I have to comment it.)
+
+then
+
+```bash
+mkdir -p build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build .
+```
+
+It can build the libraries for iOS.
+
+I haven't test the library, just using lipo to check.
+
+Please! Use with your own risk!
+Please! Use with your own risk!
+Please! Use with your own risk!
+
+
 ### Building for Windows
 
 First generate the Visual Studio 2017 project/solution files:
